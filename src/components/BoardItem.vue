@@ -5,8 +5,14 @@
 </template>
 
 <script setup lang="ts">
-const { content } = defineProps(['content'])
-const emit = defineEmits(['clickItem'])
+// modified to genertric type
+interface IProps {
+  content: 'O' | 'X' | null
+}
+const { content } = defineProps<IProps>()
+const emit = defineEmits<{
+  clickItem: []
+}>()
 
 const handleItemClick = () => {
   emit('clickItem')
