@@ -1,45 +1,21 @@
 # vue-board
 
-This template should help get you started developing with Vue 3 in Vite.
+一个使用vue3 + ts + vite 开发的tic-tac-toe
 
-## Recommended IDE Setup
+## 开发日志
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+### 2024/11/10
+#### 1. feature
+1. **layout** : 棋盘布局 & restart按钮
+2. **feature** : Player 交替 & calcWinner 逻辑
+3. **refactor** : use GPT to refactor code 
 
-## Type Support for `.vue` Imports in TS
+### 2024/11/12
+#### 1. feature
+1. **layout** : 历史棋盘 
+2. **refactor** : 回溯后落子的逻辑 & 将 board 和item 中的逻辑抽离, 变为无状态组件 
 
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) to make the TypeScript language service aware of `.vue` types.
-
-## Customize configuration
-
-See [Vite Configuration Reference](https://vite.dev/config/).
-
-## Project Setup
-
-```sh
-npm install
-```
-
-### Compile and Hot-Reload for Development
-
-```sh
-npm run dev
-```
-
-### Type-Check, Compile and Minify for Production
-
-```sh
-npm run build
-```
-
-### Run Unit Tests with [Vitest](https://vitest.dev/)
-
-```sh
-npm run test:unit
-```
-
-### Lint with [ESLint](https://eslint.org/)
-
-```sh
-npm run lint
-```
+### 2024/11/14
+#### 1. feature
+1.  **refactor** : 历史按钮中提示当前位置
+2.  **feature** : 添加切换按钮, 对落子的步数进行排序

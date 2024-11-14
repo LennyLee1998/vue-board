@@ -20,11 +20,10 @@ import type { PlayerType } from '@/types'
 type BoardType = PlayerType[]
 interface IProps {
   boardContent: BoardType
-  itemClick: (index:number) => void
+  itemClick: (index: number) => void
 }
 const { boardContent, itemClick } = defineProps<IProps>()
 const getIndex = (row: number, col: number): number => (row - 1) * 3 + col - 1
-
 </script>
 
 <style lang="less" scoped>
@@ -39,6 +38,5 @@ const getIndex = (row: number, col: number): number => (row - 1) * 3 + col - 1
     display: flex;
     gap: 5px;
   }
-
 }
 </style>

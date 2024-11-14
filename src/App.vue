@@ -1,6 +1,7 @@
 <template>
   <div class="app">
     <div class="board">
+      <div class="button" @click="handleSortClick">{{ isAsc ? 'desc' : 'asc' }}</div>
       <div class="tips">
         {{ gameStatus }}
       </div>
@@ -10,9 +11,7 @@
     <div class="history">
       <div class="btn-row" v-for="(_, key) in historyBoards" :key="key">
         <div class="idx">{{ `${key + 1}. ` }}</div>
-        <div class="button" @click="handleHisClick(key)">
-          {{ key === 0 ? 'Go to game start' : `Go to move #${key}` }}
-        </div>
+        <div class="button" @click="handleHisClick(key)">{{ setHistoryBtn(key) }}</div>
       </div>
     </div>
   </div>
@@ -26,12 +25,27 @@ import type { PlayerType } from './types'
 type BoardType = PlayerType[]
 
 const historyBoards = ref<BoardType[]>([Array(9).fill(null)])
+
+// 当前的index
 const curIdx = ref(0)
+
+const isAsc = ref(true)
+
+// history button的内容
+const setHistoryBtn = (key: number) => {
+  return key === curIdx.value
+    ? `You are at move #${isAsc.value ? key : historyBoards.value.length - key - 1}`
+    : `Go to ${(key === 0 && isAsc.value) || (key === historyBoards.value.length - 1 && !isAsc.value) ? 'game start' : 'move #' + (isAsc.value ? key : historyBoards.value.length - key - 1)}`
+}
+
 // 当前的board数组
 const boardContent = computed(() => {
   return historyBoards.value[curIdx.value]
 })
-const curPlayer = computed<Exclude<PlayerType, null>>(() => (curIdx.value % 2 ? 'O' : 'X'))
+// odd => "O" even => "X"
+const curPlayer = computed<Exclude<PlayerType, null>>(() =>
+  (isAsc.value ? curIdx.value : historyBoards.value.length - curIdx.value - 1) % 2 ? 'O' : 'X',
+)
 // 计算winner
 const winner = computed(() => calcWinner(boardContent.value, curPlayer.value === 'X' ? 'O' : 'X'))
 // 游戏是否结束
@@ -47,6 +61,12 @@ const gameStatus = computed(() => {
   }
 })
 
+const handleSortClick = () => {
+  isAsc.value = !isAsc.value
+  historyBoards.value = [...historyBoards.value].reverse()
+  curIdx.value = historyBoards.value.length - curIdx.value - 1
+}
+
 // 落子事件
 const handleItemClick = (index: number) => {
   // 如果有值 不能再点击赋值
@@ -54,8 +74,17 @@ const handleItemClick = (index: number) => {
 
   const curBoard = [...boardContent.value]
   curBoard[index] = curPlayer.value
-  historyBoards.value = historyBoards.value.slice(0, curIdx.value + 1).concat([curBoard])
-  curIdx.value++
+  // slice的区间在desc的时候应该是不同的
+  if (isAsc.value) {
+    historyBoards.value = [...historyBoards.value.slice(0, curIdx.value + 1), curBoard]
+    curIdx.value++
+  } else {
+    historyBoards.value = [
+      curBoard,
+      ...historyBoards.value.slice(curIdx.value, historyBoards.value.length),
+    ]
+    curIdx.value = 0
+  }
 }
 // restart事件
 const handleRestartClick = () => {
@@ -103,7 +132,7 @@ const calcWinner = (board: BoardType, player: Exclude<PlayerType, null>) => {
     align-items: center;
     .tips {
       font-weight: bold;
-      margin-bottom: 10px;
+      margin: 10px 0;
     }
   }
   .history {
