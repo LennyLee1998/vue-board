@@ -6,7 +6,7 @@
         v-for="col in 3"
         :key="getIndex(row, col)"
         :content="boardContent[getIndex(row, col)]"
-        @click-item="itemClick(getIndex(row, col))"
+        @click-item="() => itemClick(getIndex(row, col))"
       />
     </div>
   </div>
@@ -15,9 +15,8 @@
 <script setup lang="ts">
 // import { computed, ref } from 'vue'
 import BoardItem from '@/components/BoardItem.vue'
-import type { PlayerType } from '@/types'
+import type { BoardType } from '@/types/index'
 
-type BoardType = PlayerType[]
 interface IProps {
   boardContent: BoardType
   itemClick: (index: number) => void

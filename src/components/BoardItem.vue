@@ -5,9 +5,9 @@
 </template>
 
 <script setup lang="ts">
-// modified to genertric type
+import type { PlayerType } from '@/types';
 interface IProps {
-  content: 'O' | 'X' | null
+  content: PlayerType
 }
 const { content } = defineProps<IProps>()
 const emit = defineEmits<{
