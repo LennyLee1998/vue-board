@@ -21,7 +21,7 @@
 import { computed, ref } from 'vue'
 import BoardView from './view/BoardView.vue'
 
-import type { PlayerType } from './types'
+import type { PlayerType } from './types/index'
 type BoardType = PlayerType[]
 
 const historyBoards = ref<BoardType[]>([Array(9).fill(null)])
