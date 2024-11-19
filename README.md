@@ -25,8 +25,9 @@
 1.  **refactor** : 历史按钮中提示当前位置
 2.  **feature** : 添加切换按钮, 对落子的步数进行排序
 
-### 2024/11/15
+### 2024/11/17
 
 #### 1. feature
 
-1.  **refactor** : use GPT to refactor code
+1.  **refactor** : use GPT to refactor history code
+2. **feature**: 

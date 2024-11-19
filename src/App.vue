@@ -5,13 +5,19 @@
       <div class="tips">
         {{ gameStatus }}
       </div>
-      <BoardView :boardContent="boardContent" :itemClick="handleItemClick" />
+      <BoardView
+        :winLine="curWinLocation"
+        :boardContent="boardContent"
+        :itemClick="handleItemClick"
+      />
       <div class="button" @click="handleRestartClick">restart</div>
     </div>
     <div class="history">
       <div class="btn-row" v-for="(_, key) in historyBoards" :key="key">
         <div class="idx">{{ `${key + 1}. ` }}</div>
-        <div class="button" @click="() => handleHisClick(key)">{{ setHistoryBtn(key) }}</div>
+        <div class="button" @click="() => handleHisClick(key)">
+          {{ setHistoryBtn(key) }}
+        </div>
       </div>
     </div>
   </div>
@@ -21,23 +27,17 @@
 import { computed, ref } from 'vue'
 import BoardView from './view/BoardView.vue'
 
-import type { PlayerType, BoardType } from './types/index'
-
-const WINNER_LINES = [
-  [0, 1, 2],
-  [3, 4, 5],
-  [6, 7, 8],
-  [0, 3, 6],
-  [1, 4, 7],
-  [2, 5, 8],
-  [0, 4, 8],
-  [2, 4, 6],
-] as const
+import type { PlayerType, BoardType, LocType } from './types/index'
+import { WINNER_LINES } from './constants'
 
 const historyBoards = ref<BoardType[]>([Array(9).fill(null)])
+const curWinLocation = ref<LocType | null>(null)
 // 当前的index
 const curIdx = ref(0)
 const isAsc = ref(true)
+// curIdx不在当前的位置上则标色消失
+const winIdx = ref<number | null>(null)
+const rowCol = ref<(number[] | null)[]>([null])
 
 // 当前的board数组
 const boardContent = computed(() => {
@@ -50,11 +50,14 @@ const curPlayer = computed<Exclude<PlayerType, null>>(() =>
 
 // 计算当前是否有获胜者
 const calcWinner = (board: BoardType) => {
-  return WINNER_LINES.some(
-    ([a, b, c]) => board[a] && board[b] === board[a] && board[c] === board[a],
-  )
-    ? board[0]
-    : null
+  for (const [a, b, c] of WINNER_LINES) {
+    if (board[a] && board[b] === board[a] && board[c] === board[a]) {
+      curWinLocation.value = [a, b, c] as LocType
+      winIdx.value = curIdx.value
+      return board[a]
+    }
+  }
+  return null
 }
 // 计算winner
 const winner = computed(() => calcWinner(boardContent.value))
@@ -71,14 +74,14 @@ const gameStatus = computed(() => {
     return `The Next Player is: ${curPlayer.value}`
   }
 })
-
 // 落子事件
-const handleItemClick = (index: number) => {
+const handleItemClick = (index: number, row: number, col: number) => {
   // 如果有值 不能再点击赋值
   if (boardContent.value[index] || winner.value) return
-
   const curBoard = [...boardContent.value]
   curBoard[index] = curPlayer.value
+  rowCol.value = [...rowCol.value, [row, col]]
+
   // slice的区间在desc的时候应该是不同的
   if (isAsc.value) {
     historyBoards.value = [...historyBoards.value.slice(0, curIdx.value + 1), curBoard]
@@ -92,13 +95,16 @@ const handleItemClick = (index: number) => {
 // history button的内容
 const setHistoryBtn = (key: number) => {
   const moveNumber = isAsc.value ? key : historyBoards.value.length - key - 1
+  const position = rowCol.value[key]
+  const positionText = position ? `(${position[0]}, ${position[1]})` : ''
+
   // 当前步骤的显示逻辑
   if (key === curIdx.value) {
-    return `You are at move #${moveNumber}`
+    return `You are at move #${moveNumber}${positionText}`
   }
   // 判断是否是游戏开始的位置
   const isGameStart = isAsc.value ? key === 0 : key === historyBoards.value.length - 1
-  return `Go to ${isGameStart ? 'game start' : `move #${moveNumber}`}`
+  return `Go to ${isGameStart ? 'game start' : `move #${moveNumber}`}${positionText}`
 }
 
 const handleSortClick = () => {
@@ -109,6 +115,9 @@ const handleSortClick = () => {
 
 // 处理右侧history click
 const handleHisClick = (idx: number) => {
+  if (idx !== winIdx.value) {
+    curWinLocation.value = null
+  }
   curIdx.value = idx
 }
 
@@ -116,6 +125,7 @@ const handleHisClick = (idx: number) => {
 const handleRestartClick = () => {
   historyBoards.value = [Array(9).fill(null)]
   curIdx.value = 0
+  curWinLocation.value = null
 }
 </script>
 
